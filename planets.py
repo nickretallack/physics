@@ -13,8 +13,8 @@ window = pyglet.window.Window()
 keys = key.KeyStateHandler()
 batch = pyglet.graphics.Batch()
 
-gravitational_constant = 20000.
-jump_impulse = 300.
+gravitational_constant = 200.
+jump_impulse = 3000.
 
 def generate_circle(radius=100, steps=50):
   verts = []
@@ -40,7 +40,6 @@ def generate_circular_object(radius=100, location=(200,200), verticies=None):
   else:
     vert_count = int(radius / 5.) + 10
   vert_list = generate_circle(radius=radius, steps=vert_count)
-  print len(vert_list), vert_count
   display = batch.add(vert_count, GL_LINE_LOOP, PositionedList(shape), ('v2f', vert_list))
 
   return shape
@@ -62,7 +61,7 @@ class PositionedList(pyglet.graphics.Group):
 
 planet = generate_circular_object(radius=100, location=(200,200))
 moon = generate_circular_object(radius=50, location=(700,200))
-moon.body.velocity = Vec2d(0,10)
+moon.body.velocity = Vec2d(0,76)
 player = generate_circular_object(radius=10,  location=(400,400), verticies=5)
 
 bodies = [player.body, planet.body]
@@ -76,7 +75,7 @@ def get_gravity(body1, body2):
 def find_nearest_body(our_body):
   nearest_body = None
   nearest_distance = 999999999999.
-  for body in bodies:
+  for body in space.bodies:
     if body != our_body:
       distance = body.position.get_dist_sqrd(our_body.position)
       if distance < nearest_distance:
@@ -94,9 +93,9 @@ def maybe_jump(player):
     
 @window.event
 def update(dt):
-  for body in bodies:
+  for body in space.bodies:
     body.reset_forces()
-    for body2 in bodies:
+    for body2 in space.bodies:
       if body2 != body:
         body.apply_force(get_gravity(body, body2), pymunk.Vec2d(0,0))
 
@@ -107,7 +106,28 @@ def update(dt):
     spinning = -1
   elif keys[key.RIGHT]:
     spinning = 1
-  
+
+  jetpack = Vec2d(0,0)
+  if keys[key.NUM_6]:
+    jetpack.x += 1
+  if keys[key.NUM_4]:
+    jetpack.x -= 1
+  if keys[key.NUM_8]:
+    jetpack.y += 1
+  if keys[key.NUM_2]:
+    jetpack.y -= 1
+
+  if keys[key.NUM_1]:
+    jetpack += (-0.5,-0.5)
+  if keys[key.NUM_3]:
+    jetpack += (+0.5,-0.5)
+  if keys[key.NUM_7]:
+    jetpack += (-0.5,+0.5)
+  if keys[key.NUM_9]:
+    jetpack += (+0.5,+0.5)
+
+  player.body.apply_force(jetpack.normalized()*1000,(0,0))
+
   player.body.torque = 60000.0 * min( (player.body.angular_velocity - spinning*max_w)/max_w, 1.0)
 
   space.step(dt)
