@@ -25,7 +25,7 @@ def generate_circle(radius=100, steps=50):
 
 def generate_circular_object(radius=100, location=(200,200), verticies=None):
   # physics
-  mass = math.pi * radius * radius / 200.
+  mass = 4/3 * math.pi * radius**3 / 200.
   inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
   body = pymunk.Body(mass, inertia)
   body.position = location
