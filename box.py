@@ -1,8 +1,14 @@
+from util import *
+
+import random
+import math
+
 import pyglet
 from pyglet.window import key
 from pyglet.gl import *
-import random
-import math
+window = pyglet.window.Window()
+keys = key.KeyStateHandler()
+batch = pyglet.graphics.Batch()
 
 import pymunk
 from pymunk.vec2d import Vec2d
@@ -10,11 +16,21 @@ pymunk.init_pymunk()
 space = pymunk.Space()
 #space.set_gravity()
 
-window = pyglet.window.Window()
-keys = key.KeyStateHandler()
-batch = pyglet.graphics.Batch()
 
 jump_impulse = 100.
+
+def make_box(radius=10, density=1, loc=(200,200), batch=batch):
+  mass = (2*radius)**3 * density
+  points = [(-radius, -radius), (-radius, radius), (radius,radius), (radius, -radius)]
+  moment = pymunk.moment_for_poly(mass, points, (0,0))
+  body = pymunk.Body(mass, moment)
+  body.position = loc
+  shape = pymunk.Poly(body, points, (0,0))
+  shape.friction = 1
+  space.add(body, shape)
+  display = batch.add(points.length, GL_LINE_LOOP, PositionedList(shape), ('v2f', flatten(points)))
+  return shape
+
 
 
 def generate_circular_object(radius=100, location=(200,200), verticies=None):
@@ -29,9 +45,7 @@ def generate_circular_object(radius=100, location=(200,200), verticies=None):
   space.add(body, shape)
 
   # visuals
-  if verticies:
-    vert_count = verticies
-  else:
+  if not verticies:
     vert_count = int(radius / 5.) + 10
   vert_list = generate_circle(radius=radius, steps=vert_count)
   print len(vert_list), vert_count
