@@ -99,6 +99,9 @@ def update(dt):
       if body2 != body:
         body.apply_force(get_gravity(body, body2), pymunk.Vec2d(0,0))
 
+  # todo: make jumping chargeable
+  # todo in another game: simulate mario bros jump physics with chipmunk
+
   max_w = -10.0
   sv = pymunk.vec2d.Vec2d(5,5)
   spinning = 0
@@ -108,13 +111,13 @@ def update(dt):
     spinning = 1
 
   jetpack = Vec2d(0,0)
-  if keys[key.NUM_6]:
+  if keys[key.NUM_6] or keys[key.D]:
     jetpack.x += 1
-  if keys[key.NUM_4]:
+  if keys[key.NUM_4] or keys[key.A]:
     jetpack.x -= 1
-  if keys[key.NUM_8]:
+  if keys[key.NUM_8] or keys[key.W]:
     jetpack.y += 1
-  if keys[key.NUM_2]:
+  if keys[key.NUM_2] or keys[key.S]:
     jetpack.y -= 1
 
   if keys[key.NUM_1]:
