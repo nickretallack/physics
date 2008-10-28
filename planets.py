@@ -13,8 +13,36 @@ window = pyglet.window.Window()
 keys = key.KeyStateHandler()
 batch = pyglet.graphics.Batch()
 
-gravitational_constant = 200.
 jump_impulse = 3000.
+
+player = None
+
+def load(file):
+  from os.path import splitext
+  type = splitext(file)[1]
+  if type == '.js':
+    try: import json 
+    except ImportError: import simplejson as json
+    data = json.load(open(file))
+  else:
+    print "%s: Unsupported Filetype" % file
+    exit()
+
+  for body_tag in data:
+    body_specs = data[body_tag]
+    body = generate_circular_object(radius=body_specs['radius'], location=body_specs['location'])
+    if body_tag == 'player':
+      global player
+      player = body
+
+
+
+#planet = generate_circular_object(radius=100, location=(200,200))
+#moon = generate_circular_object(radius=50, location=(700,200))
+#moon.body.velocity = Vec2d(0,76)
+#player = generate_circular_object(radius=10,  location=(400,400), verticies=5)
+
+
 
 def generate_circle(radius=100, steps=50):
   verts = []
@@ -28,7 +56,7 @@ def generate_circular_object(radius=100, location=(200,200), verticies=None):
   mass = 4/3 * math.pi * radius**3 / 200.
   inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
   body = pymunk.Body(mass, inertia)
-  body.position = location
+  body.position = Vec2d(location)
   body.radius = radius
   shape = pymunk.Circle(body, radius, (0,0))
   shape.friction = 2
@@ -59,18 +87,18 @@ class PositionedList(pyglet.graphics.Group):
   def unset_state(self):
     glPopMatrix()
 
-planet = generate_circular_object(radius=100, location=(200,200))
-moon = generate_circular_object(radius=50, location=(700,200))
-moon.body.velocity = Vec2d(0,76)
-player = generate_circular_object(radius=10,  location=(400,400), verticies=5)
+#planet = generate_circular_object(radius=100, location=(200,200))
+#moon = generate_circular_object(radius=50, location=(700,200))
+#moon.body.velocity = Vec2d(0,76)
+#player = generate_circular_object(radius=10,  location=(400,400), verticies=5)
 
-bodies = [player.body, planet.body]
+#bodies = [player.body, planet.body]
 
-def get_gravity(body1, body2):
+def get_gravity(body1, body2, G=200.):
   distance_squared = body1.position.get_dist_sqrd(body2.position)
-  gravity = -gravitational_constant * body1.mass * body2.mass / distance_squared
+  gravity = -G * body1.mass * body2.mass / distance_squared
   return (body1.position - body2.position).normalized() * gravity
-  
+
 
 def find_nearest_body(our_body):
   nearest_body = None
@@ -83,14 +111,14 @@ def find_nearest_body(our_body):
         nearest_distance = distance
   return nearest_body
 
-def maybe_jump(player):
+def maybe_jump():
   body = player.body
   nearest_body = find_nearest_body(body)
   distance = body.position.get_distance(nearest_body.position) 
   if distance < body.radius + nearest_body.radius + 5:
     impulse = (body.position - nearest_body.position).normalized() * jump_impulse
     body.apply_impulse(impulse,(0,0))
-    
+
 @window.event
 def update(dt):
   for body in space.bodies:
@@ -103,7 +131,7 @@ def update(dt):
   # todo in another game: simulate mario bros jump physics with chipmunk
 
   max_w = -10.0
-  sv = pymunk.vec2d.Vec2d(5,5)
+  #sv = pymunk.vec2d.Vec2d(5,5)
   spinning = 0
   if keys[key.LEFT]:
     spinning = -1
@@ -140,13 +168,16 @@ pyglet.clock.schedule_interval(update, 1/60.)
 def on_key_press(symbol, modifier):
   if symbol == key.UP:
     # jump -- should probably check that we're close enough to the planet
-    maybe_jump(player)
+    maybe_jump()
 
 @window.event
 def on_draw():
   glClear(GL_COLOR_BUFFER_BIT)
   glLoadIdentity()
   batch.draw()
+
+load('mooney.js')
+
 
 window.push_handlers(keys)
 pyglet.app.run()

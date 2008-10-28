@@ -1,0 +1,3 @@
+Level Format
+  Anything that maps to a hash, be it json, yaml, xml, python.  We can discover the type by the file extension.
+  Subclass of 'Level' if we need more details, like special behaviors.  Should have a load method of some sort -- unload is implicit, simply purge.
