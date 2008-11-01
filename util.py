@@ -17,7 +17,7 @@ def mutual_gravitation(bodies,G):
         body.apply_force(get_gravity(body, body2,G), pymunk.Vec2d(0,0))
 
 def get_gravity(body1, body2, G):
-  distance_squared = body1.position.get_dist_sqrd(body2.position)
+  distance_squared = body1.position.get_distance(body2.position)
   gravity = -G * body1.mass * body2.mass / distance_squared
   return (body1.position - body2.position).normalized() * gravity
 
