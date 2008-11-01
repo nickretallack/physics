@@ -11,13 +11,13 @@ def active_space_controls(player,keys):
   from pyglet.window import key
   spinning = 0
   if keys[key.LEFT]:
-    spinning += -1
-  if keys[key.RIGHT]:
     spinning += 1
+  if keys[key.RIGHT]:
+    spinning += -1
 
-  max_w = -10.0
-  player.body.torque = 60000000.0 * min( (player.body.angular_velocity - spinning*max_w)/max_w, 1.0)
-
+  #max_w = -10.0
+  #player.body.torque = 60000000.0 * min( (player.body.angular_velocity - spinning*max_w)/max_w, 1.0)
+  player.body.torque = 6000 * spinning
 
   jetpack = Vec2d(0,0)
   if keys[key.NUM_6] or keys[key.D]:
@@ -45,7 +45,7 @@ def find_nearest_body(our_body,space):
   nearest_distance = 999999999999.
   for body in space.bodies:
     if body != our_body:
-      distance = body.position.get_dist_sqrd(our_body.position)
+      distance = body.position.get_distance(our_body.position) - body.radius - our_body.radius
       if distance < nearest_distance:
         nearest_body = body
         nearest_distance = distance
@@ -55,6 +55,6 @@ def maybe_jump(player,space):
   body = player.body
   nearest_body = find_nearest_body(body,space)
   distance = body.position.get_distance(nearest_body.position) 
-  if distance < body.radius + nearest_body.radius + 5:
-    impulse = (body.position - nearest_body.position).normalized() * 3000.
+  if distance < body.radius + nearest_body.radius + 10:
+    impulse = (body.position - nearest_body.position).normalized() * 5000.
     body.apply_impulse(impulse,(0,0))
