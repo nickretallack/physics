@@ -11,7 +11,6 @@ def generate_circle(radius=100, steps=50):
 # PHYSICS
 def mutual_gravitation(bodies):
   for body in bodies:
-    body.reset_forces()
     for body2 in bodies:
       if body2 != body:
         body.apply_force(get_gravity(body, body2), pymunk.Vec2d(0,0))
