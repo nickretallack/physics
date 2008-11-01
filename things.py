@@ -15,8 +15,8 @@ class Thing:
     self.level = level
 
 
-class RoundThing:
-  def __init__(self, radius=100, position=(200,200), verticies=None, level=None):
+class Circle:
+  def __init__(self, level, radius=100, position=(0,0), verticies=None, orbit=None):
     # physics
     mass = 4/3 * math.pi * radius**3 / 200
     inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
@@ -32,6 +32,13 @@ class RoundThing:
       verticies = int(radius / 5.) + 10
     vert_list = generate_circle(radius=radius, steps=verticies)
     display = level.batch.add(verticies, GL_LINE_LOOP, PositionedList(self), ('v2f', vert_list))
+
+    if orbit:
+      gravitation = 200 * (body.mass + orbit.body.mass)
+      distance = body.position.get_distance(orbit.body.position)
+      speed = (gravitation/distance)**(0.5)
+      body.velocity = (body.position - orbit.body.position).rotated(90).normalized() * speed
+
 
     self.body = body
     self.shape = shape

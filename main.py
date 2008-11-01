@@ -1,3 +1,4 @@
+from __future__ import division
 import levels
 import controls
 
@@ -7,7 +8,7 @@ import pyglet
 from pyglet.gl import *
 class GameWindow(pyglet.window.Window):
   def __init__(self,game,**args):
-    super(GameWindow, self).__init__(**args)
+    super(GameWindow, self).__init__(resizable=True,**args)
     self.game = game
     self.keys = pyglet.window.key.KeyStateHandler()
     self.push_handlers(self.keys)
@@ -31,7 +32,7 @@ class Game:
     pymunk.init_pymunk()
     self.window = GameWindow(game=self)
     self.controlling = None
-    self.current_level = levels.SpaceLevel(game=self)
+    self.current_level = levels.Fun(game=self)
     pyglet.clock.schedule_interval(self.update, 1/60.)
 
   def update(self,dt):

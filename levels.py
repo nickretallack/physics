@@ -1,9 +1,15 @@
+from __future__ import division
 import pymunk
+from pymunk.vec2d import Vec2d
 import pyglet
 
-from things import *
+import things
+from util import *
 
-class SpaceLevel:
+import random
+random.seed()
+
+class Level:
   def camera_focus(self):
     return self.game.controlling.body.position
   
@@ -11,11 +17,16 @@ class SpaceLevel:
     self.game  = game
     self.space = pymunk.Space()
     self.batch = pyglet.graphics.Batch()
-
-    player = RoundThing(level=self, radius=10, verticies=5, )
-    self.things = {'player':player}
+    self.things = {}
+    self.create_player()
+    self.create_things()
+    
+  def create_player(self):
+    player = things.Circle(level=self, radius=10, verticies=5)
     self.game.controlling = player
-    RoundThing(level=self,position=(0,1))
+    
+  def create_things(self):
+    things.Circle(level=self,position=(0,-100))
   
   def pre_step(self):
     for body in self.space.bodies:
@@ -24,3 +35,23 @@ class SpaceLevel:
   def step(self, dt):
     mutual_gravitation(self.space.bodies)
     self.space.step(dt)
+
+class Fun(Level):
+  def create_things(self):
+    planet = things.Circle(level=self, radius=200, position=(0,-210))
+    for thing in xrange(20):
+      position = (random.randint(400,500), thing*10)
+      troid = things.Circle(level=self, radius=10, position=position, orbit=planet)
+      #troid.body.velocity = (-0,200)
+
+
+class File(Level):
+  def __init__(self,game,file):
+    self.file = file
+    super(self, Level).__init__(game)
+
+  def create_things(self):
+    data = format_loader(self.file)
+
+    for body_tag in data:
+      things.Circle(level=self, *data[body_tag])

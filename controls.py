@@ -1,3 +1,4 @@
+from __future__ import division
 from pymunk.vec2d import Vec2d
 
 def passive_space_controls(player,symbol):
