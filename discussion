@@ -1,3 +1,79 @@
-Level Format
-  Anything that maps to a hash, be it json, yaml, xml, python.  We can discover the type by the file extension.
-  Subclass of 'Level' if we need more details, like special behaviors.  Should have a load method of some sort -- unload is implicit, simply purge.
+  Level Format
+Anything that maps to a hash, be it json, yaml, xml, python.  We can discover the type by the file extension.
+Subclass of 'Level' if we need more details, like special behaviors.  Should have a load method of some sort -- unload is implicit, simply purge.
+
+object properties:
+  orbit(object,eccentricity), warp(level,position-offset(for consistency))
+
+meta properties:
+  edges box -- hard/bouncy barrier, warp to neighbor level -- what happens when things cross edges?  shouldn't leave objects behind just because the player crossed over...   simulate neighbor levels?  Needs to be clear to the player what radius things are simulating within.
+  
+
+
+
+I should make levels as classes to start out.  Maybe dynamically load classes by name?
+then pickle them when you leave the level.
+
+
+should levels have their own control set?  their own player object?
+they might have different gravity
+
+
+
+  Level Loading/Unloading
+When a player first enters a level, it loads pristine, just as the config file coded it.  However, things will change, and we should preserve those changes.
+Pickle old levels.  Prefer to load from pickled files if they already exist for this player.
+When to pickle: how about when you enter a new level, it checks for levels in memory that do not neighbor it, and pickles them?
+In fact, we could have a configuration constant for the neighbor-distance at which we should keep levels in memory.  Zero is useful: only spend memory on the level we're currently in.
+When a player re-enters a level they have left, maybe we should simulate what happened while they were gone?  Might be dangerous though -- chipmunk is known to let things go through other things in large timesteps.
+
+when moving to a new level, sometimes physical properties should come too.  Like, what if they own a certain kind of ship, are damaged, etc.  What if they're flying through space still.  However, maybe some levels completely change the scale of things, or make you a different sprite?  grr, looks like we'll need some meta information here.
+
+  Mipping Vectors
+we could totally create extra display lists for when you zoom in real close, or out real far, to increase or reduce the geometry.  Of course, if we're going to transplant vertex lists, we should be careful to avoid having a sticking point where you can flip back and forth between them.
+
+
+
+starting the game:
+
+create a window
+
+
+
+
+
+general-ness:
+  camera center point is defined by level / camera controls, not necessarily focused on player
+    level holds the definitive camera posiion data
+  
+  controls can be applied to any objects.  There's no difference between objects an a player.
+    just add control-type in level formats.  Controls get placed on all these objects
+    avoid control styles that care what's on the screen right now
+    control sets publish a set of handlers.  These are pushed onto the game window, popped when level is over
+    
+    there is nothing special about a player object.  Any object can be migrated to another level.
+      then how do we decide which level is shown?  camera-follow!  Whatever body is on camera also decides the level/batch
+      of graphics we draw.
+
+      for controls, it matters if the controller is active or not.  You might want to switch out and stop controlling something for a while.  
+      
+      
+      Ugh, controls are a complex question.  What about objects that might be pickled?  Objects that aren't in our current space?  Should they still have event handlers registered?
+      
+      Argh.  This is too complicated.  From now on, all user input shall be gathered in the window class.  It will have access to a current_object pointer or function, as well as the current level's objects and all that.  The question of alternate control styles will be addressed later.  For now, the window is allowed to reach into the level and mess with things.
+
+
+game structure:
+  Game
+    Windows
+    Levels
+      Camera
+      Batch
+      Space - bodies and shapes
+      Bodies - stack map like in django?
+        body, shapes
+        Vertex List
+        Controls
+        
+        
+        
