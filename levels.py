@@ -14,6 +14,7 @@ class Level:
     return self.game.controlling.body.position
   
   def __init__(self,game):
+    self.gravity = 1
     self.game  = game
     self.space = pymunk.Space()
     self.batch = pyglet.graphics.Batch()
@@ -33,7 +34,7 @@ class Level:
       body.reset_forces()
   
   def step(self, dt):
-    mutual_gravitation(self.space.bodies)
+    mutual_gravitation(self.space.bodies, G=self.gravity)
     self.space.step(dt)
 
 class Fun(Level):

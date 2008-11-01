@@ -16,7 +16,7 @@ def active_space_controls(player,keys):
     spinning += 1
 
   max_w = -10.0
-  player.body.torque = 60000.0 * min( (player.body.angular_velocity - spinning*max_w)/max_w, 1.0)
+  player.body.torque = 60000000.0 * min( (player.body.angular_velocity - spinning*max_w)/max_w, 1.0)
 
 
   jetpack = Vec2d(0,0)

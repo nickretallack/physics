@@ -16,16 +16,20 @@ class Thing:
 
 
 class Circle:
-  def __init__(self, level, radius=100, position=(0,0), verticies=None, orbit=None):
+  def __init__(self, level, radius=100, position=(0,0), density=1.0, verticies=None, orbit=None, static=False):
     # physics
-    mass = 4/3 * math.pi * radius**3 / 200
+    mass = 4/3 * math.pi * radius**3 * density * 0.1
     inertia = pymunk.moment_for_circle(mass, 0, radius, (0,0))
     body = pymunk.Body(mass, inertia)
     body.position = Vec2d(position)
     body.radius = radius
     shape = pymunk.Circle(body, radius, (0,0))
     shape.friction = 2
-    level.space.add(body,shape)
+
+    if static:
+      level.space.add_static(body,shape)
+    else:
+      level.space.add(body,shape)
 
     # visuals
     if not verticies:
@@ -34,7 +38,7 @@ class Circle:
     display = level.batch.add(verticies, GL_LINE_LOOP, PositionedList(self), ('v2f', vert_list))
 
     if orbit:
-      gravitation = 200 * (body.mass + orbit.body.mass)
+      gravitation = level.gravity * (body.mass + orbit.body.mass)
       distance = body.position.get_distance(orbit.body.position)
       speed = (gravitation/distance)**(0.5)
       body.velocity = (body.position - orbit.body.position).rotated(90).normalized() * speed
