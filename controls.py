@@ -17,7 +17,7 @@ def active_space_controls(player,keys):
 
   #max_w = -10.0
   #player.body.torque = 60000000.0 * min( (player.body.angular_velocity - spinning*max_w)/max_w, 1.0)
-  player.body.torque = 6000 * spinning
+  player.body.torque = 6000000 * spinning
 
   jetpack = Vec2d(0,0)
   if keys[key.NUM_6] or keys[key.D]:
@@ -56,5 +56,5 @@ def maybe_jump(player,space):
   nearest_body = find_nearest_body(body,space)
   distance = body.position.get_distance(nearest_body.position) 
   if distance < body.radius + nearest_body.radius + 10:
-    impulse = (body.position - nearest_body.position).normalized() * 5000.
+    impulse = (body.position - nearest_body.position).normalized() * 80000.
     body.apply_impulse(impulse,(0,0))

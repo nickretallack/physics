@@ -11,7 +11,7 @@ random.seed()
 
 class Level:
   def camera_focus(self):
-    return self.game.controlling.body.position
+    return Vec2d(0,0)#return self.game.controlling.body.position
   
   def __init__(self,game):
     self.gravity = 1
@@ -23,7 +23,8 @@ class Level:
     self.create_things()
     
   def create_player(self):
-    player = things.Circle(level=self, radius=10, verticies=5)
+    #player = things.Circle(level=self, radius=10, verticies=5)
+    player = things.Asteroid(level=self, verticies=[(0,0),(5,0),(5,100),(0,100)])
     self.game.controlling = player
     
   def create_things(self):
@@ -35,7 +36,9 @@ class Level:
   
   def step(self, dt):
     mutual_gravitation(self.space.bodies, G=self.gravity)
-    self.space.step(dt)
+    substeps = 2
+    for substep in xrange(substeps):
+      self.space.step(dt/substeps)
 
 class Fun(Level):
   def create_things(self):
